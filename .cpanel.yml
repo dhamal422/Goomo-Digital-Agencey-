@@ -1,0 +1,6 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/goomozon/myapp/
+    - /bin/bash -c "source /home/goomozon/nodevenv/myapp/24/bin/activate && cd /home/goomozon/myapp && npm install && npm run build"
+    - /bin/touch /home/goomozon/myapp/tmp/restart.txt
