@@ -1,4 +1,4 @@
-name: Deploy Vite Website to Subdomain via SFTP
+name: Deploy Vite Website to Subdomain
 
 on:
   push:
@@ -24,12 +24,12 @@ jobs:
     - name: 🛠️ Build Project
       run: npm run build
 
-    - name: 🚀 Sync dist folder to Subdomain via SFTP
-      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+    - name: 🚀 Sync files to Subdomain via FTP
+      uses: SebRollen/file-deployer@v0.0.9
       with:
+        host: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server: ${{ secrets.FTP_SERVER }}
-        ssh_port: 22                             # cPanel का डिफ़ॉल्ट SFTP पोर्ट
-        local_path: ./dist/*                     # बिल्ड फोल्डर की सारी फाइलें
-        remote_path: /home/goomozon/my.goomozon.shop/ # आपके सबडोमेन का असली पाथ
+        port: 21
+        local-dir: ./dist/
+        remote-dir: ./
