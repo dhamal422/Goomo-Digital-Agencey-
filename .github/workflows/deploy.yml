@@ -1,4 +1,4 @@
-name: Deploy Website to cPanel
+name: Deploy Vite Website to Subdomain
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    name: 🎉 Build and Deploy
+    name: 🎉 Build and Deploy to Subdomain
     runs-on: ubuntu-latest
     steps:
     - name: 🚚 Get latest code
@@ -18,12 +18,13 @@ jobs:
       with:
         node-version: 20
 
-    - name: 📦 Install & Build
-      run: |
-        npm install
-        npm run build
+    - name: 📦 Install Dependencies
+      run: npm install
 
-    - name: 🚀 Sync dist folder to cPanel via FTP
+    - name: 🛠️ Build Project
+      run: npm run build
+
+    - name: 🚀 Sync dist folder to Subdomain via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.FTP_SERVER }}
@@ -31,4 +32,4 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         port: 21
         local-dir: ./dist/
-        server-dir: public_html/
+        server-dir: ./
