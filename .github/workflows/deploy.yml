@@ -24,11 +24,37 @@ jobs:
     - name: 🛠️ Build Project
       run: npm run build
 
-    - name: 🚀 Sync files to Subdomain via FTP
-      uses: QuadraPol/FTP-Deploy-Action@v3.0.0
-      with:
-        ftp-server: ${{ secrets.FTP_SERVER }}
-        ftp-username: ${{ secrets.FTP_USERNAME }}
-        ftp-password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./dist
-        remote-dir: /
+    - name: 🚀 Sync dist folder via Node Script
+      env:
+        FTP_SERVER: ${{ secrets.FTP_SERVER }}
+        FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+        FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      run: |
+        npm install vinyl-ftp fancy-log
+        node -e "
+        const ftp = require('vinyl-ftp');
+        const log = require('fancy-log');
+        const conn = new ftp({
+          host: process.env.FTP_SERVER,
+          user: process.env.FTP_USERNAME,
+          password: process.env.FTP_PASSWORD,
+          port: 21,
+          parallel: 5,
+          log: log
+        });
+        const fs = require('fs');
+        const path = require('path');
+        function uploadDir(localPath, remotePath) {
+          const files = fs.readdirSync(localPath);
+          files.forEach(file => {
+            const curPath = path.join(localPath, file);
+            const remPath = path.join(remotePath, file);
+            if (fs.lstatSync(curPath).isDirectory()) {
+              conn.mkdir(remPath, true, () => uploadDir(curPath, remPath));
+            } else {
+              fs.createReadStream(curPath).pipe(conn.dest(remotePath));
+            }
+          });
+        }
+        uploadDir('./dist', '/');
+        "
