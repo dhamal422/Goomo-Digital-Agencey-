@@ -24,11 +24,7 @@ jobs:
     - name: 🛠️ Build Project
       run: npm run build
 
-    - name: 🚀 Sync files to Subdomain via Standard FTP
-      uses: IshmaelA/Ftp-Deploy-Action@v1.0.0
-      with:
-        ftp-server: ${{ secrets.FTP_SERVER }}
-        ftp-username: ${{ secrets.FTP_USERNAME }}
-        ftp-password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./dist/
-        remote-dir: ./
+    - name: 🚀 Sync files to Subdomain via Native lftp
+      run: |
+        sudo apt-get update && sudo apt-get install -y lftp
+        lftp -e "set ftp:passive-mode true; set ftp:ssl-allow false; open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' -p 21 ${{ secrets.FTP_SERVER }}; mirror -R ./dist/ ./; quit"
