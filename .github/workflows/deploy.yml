@@ -1,34 +1,32 @@
-name: Deploy Vite Website to Subdomain
+name: Build and Commit dist
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+
+permissions:
+  contents: write
 
 jobs:
-  build-and-deploy:
-    name: 🎉 Build and Deploy to Subdomain
+  build:
     runs-on: ubuntu-latest
     steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: 🛠️ Set up Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 24
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
 
-    - name: 📦 Install Dependencies
-      run: npm install
+      - name: Install & Build
+        run: |
+          npm install
+          npm run build
 
-    - name: 🛠️ Build Project
-      run: npm run build
-
-    - name: 🚀 Sync files to Subdomain via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-      with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./dist/
-        server-dir: /myapp/dist/
+      - name: Commit dist folder
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-build dist"
+          file_pattern: dist/*
+          skip_dirty_check: false
