@@ -24,12 +24,11 @@ jobs:
     - name: 🛠️ Build Project
       run: npm run build
 
-    - name: 🚀 Sync files to Subdomain via FTP
-      uses: SebRollen/file-deployer@v0.0.9
+    - name: 🚀 Sync files to Subdomain via Standard FTP
+      uses: IshmaelA/Ftp-Deploy-Action@v1.0.0
       with:
-        host: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        port: 21
+        ftp-server: ${{ secrets.FTP_SERVER }}
+        ftp-username: ${{ secrets.FTP_USERNAME }}
+        ftp-password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./dist/
         remote-dir: ./
