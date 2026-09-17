@@ -20,5 +20,3 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: 'public_html/'
-        port: 21              # यह लाइन होस्टिंग का सही पोर्ट तय करेगी
-        secure: false         # यह लाइन बिना किसी एरर के सीधा लॉगिन कराएगी
