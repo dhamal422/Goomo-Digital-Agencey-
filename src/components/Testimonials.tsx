@@ -191,18 +191,25 @@ export const Testimonials: React.FC = () => {
               }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {displayedTestimonials.map((t) => (
+              {displayedTestimonials.map((t, idx) => (
                 <motion.div
                   key={t.id}
                   variants={{
-                    hidden: { opacity: 0, y: 30 },
+                    hidden: { 
+                      opacity: 0, 
+                      x: idx % 2 === 0 ? -50 : 50,
+                      rotateY: idx % 2 === 0 ? -8 : 8 
+                    },
                     visible: { 
                       opacity: 1, 
-                      y: 0,
-                      transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
+                      x: 0,
+                      rotateY: 0,
+                      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
                     }
                   }}
-                  className="bg-gradient-to-r from-[#009245] to-[#fcee21] hover:from-[#00a850] hover:to-[#fff13c] border border-emerald-700/50 hover:border-yellow-500 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group text-white"
+                  whileHover={{ scale: 1.025, rotateY: idx % 2 === 0 ? -2 : 2, rotateX: 2 }}
+                  style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+                  className="bg-gradient-to-r from-[#009245] to-[#fcee21] hover:from-[#00a850] hover:to-[#fff13c] border border-emerald-700/50 hover:border-yellow-500 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group text-white"
                 >
                   <div>
                     {/* Top Bar: Category Pill & Star Rating */}

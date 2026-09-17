@@ -78,24 +78,23 @@ export const ServiceEcommerceActionCard: React.FC<ServiceEcommerceActionCardProp
           </span>
         </button>
 
-        {/* Add to Cart Button: Glossy charcoal black with rounded-2xl & inner gloss accent */}
-        <button
-          type="button"
-          onClick={handleCartClick}
+        {/* WhatsApp Inquiry Button */}
+        <a
+          href={whatsAppUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex-1 h-14 bg-[#1c2431] hover:bg-[#232d3d] border-t border-slate-600/70 border-b border-slate-800 border-x border-slate-700/80 rounded-2xl flex items-center justify-center transition-all duration-200 cursor-pointer shadow-lg hover:shadow-cyan-500/10 group relative overflow-hidden"
         >
           {/* Subtle top inner gloss accent */}
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-400/40 to-transparent" />
           
           <div className="flex items-center justify-center space-x-2 text-white font-extrabold text-sm sm:text-base">
-            <ShoppingCart className="w-4 h-4 text-slate-300 group-hover:text-white transition-colors" />
-            <span className="tracking-wide">
-              {addedToCart ? 'Added to Cart ✓' : 'Add to cart'}
-            </span>
+            <MessageSquare className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+            <span className="tracking-wide">WhatsApp Us</span>
           </div>
-        </button>
+        </a>
 
-        {/* Buy Now Button: Vibrant pastel holographic gradient with lightning bolt & dark bold text */}
+        {/* Free Quote Button: Vibrant pastel holographic gradient with lightning bolt & dark bold text */}
         <button
           type="button"
           onClick={onBuyNow}
@@ -103,7 +102,7 @@ export const ServiceEcommerceActionCard: React.FC<ServiceEcommerceActionCardProp
         >
           <div className="flex items-center justify-center space-x-1.5 text-slate-950 font-black text-sm sm:text-base">
             <span className="text-amber-500 text-base filter drop-shadow-sm">⚡</span>
-            <span className="tracking-tight font-black">Buy Now</span>
+            <span className="tracking-tight font-black">Get Free Quote</span>
           </div>
         </button>
 

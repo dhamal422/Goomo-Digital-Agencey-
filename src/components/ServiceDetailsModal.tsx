@@ -345,10 +345,10 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
                       </span>
                     </div>
                   ) : (
-                    <div className="flex items-baseline space-x-2 px-4 py-2 rounded-2xl bg-amber-500/20 border border-amber-500/40 backdrop-blur-md shadow-xl">
-                      <span className="text-xs text-amber-300 font-bold uppercase tracking-wider">Starts at</span>
-                      <span className="text-xl sm:text-2xl font-black text-amber-300">
-                        {formatPrice(service.basePrice)}
+                    <div className="flex items-center space-x-2 px-4 py-2 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 backdrop-blur-md shadow-xl">
+                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                      <span className="text-xs sm:text-sm font-black text-emerald-300 uppercase tracking-wider">
+                        Free Custom Quote
                       </span>
                     </div>
                   )}

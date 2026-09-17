@@ -53,63 +53,43 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-200 text-slate-900 shadow-md">
       
-      {/* Top Worldwide Currency Header Bar */}
-      <div className="bg-[#080d15] text-slate-300 text-[11px] py-1.5 px-4 border-none">
+      {/* Top Quality & Trust Pillars Bar */}
+      <div className="bg-[#060a14] text-slate-300 text-[11px] py-1.5 px-4 border-b border-slate-800/80">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="text-slate-400 font-medium hidden sm:inline">Auto Geo-Currency Active:</span>
-            <span className="text-emerald-400 font-bold">
-              {currentCurrency.flag} {currentCurrency.code} ({currentCurrency.symbol})
-            </span>
-            {detectedCountry && (
-              <span className="text-slate-500 text-[10px] hidden md:inline">
-                • Location: {detectedCountry}
-              </span>
-            )}
+          <div className="flex items-center space-x-4 overflow-x-auto scrollbar-none text-[11px]">
+            <div className="flex items-center space-x-1.5 font-bold text-cyan-400">
+              <span>⚡</span>
+              <span>FAST LOADING</span>
+            </div>
+            <span className="text-slate-700 hidden sm:inline">•</span>
+            <div className="flex items-center space-x-1.5 font-bold text-emerald-400 hidden sm:flex">
+              <span>🛡️</span>
+              <span>SECURE & RELIABLE</span>
+            </div>
+            <span className="text-slate-700 hidden md:inline">•</span>
+            <div className="flex items-center space-x-1.5 font-bold text-sky-400 hidden md:flex">
+              <span>📱</span>
+              <span>MOBILE FRIENDLY</span>
+            </div>
+            <span className="text-slate-700 hidden lg:inline">•</span>
+            <div className="flex items-center space-x-1.5 font-bold text-indigo-400 hidden lg:flex">
+              <span>📈</span>
+              <span>SEO OPTIMIZED</span>
+            </div>
           </div>
 
-          {/* Worldwide Currency Dropdown Selector */}
-          <div className="relative">
+          <div className="flex items-center space-x-3 text-xs">
             <button
-              onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
-              className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-[#131b26] border border-slate-700/70 hover:border-cyan-400 text-slate-200 font-bold text-[11px] transition shadow-xs cursor-pointer"
+              onClick={() => {
+                const el = document.getElementById('website-styles-catalog');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                else navigate('home');
+              }}
+              className="text-[11px] font-bold text-cyan-300 hover:text-cyan-200 transition cursor-pointer flex items-center space-x-1"
             >
-              <span>{currentCurrency.flag}</span>
-              <span>{currentCurrency.code} ({currentCurrency.symbol})</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
+              <span>Modern Website Styles</span>
+              <span>→</span>
             </button>
-
-            {isCurrencyOpen && (
-              <div 
-                className="absolute right-0 mt-1 w-56 bg-[#131b26] border border-slate-700 rounded-xl shadow-2xl py-1 z-50 text-white text-xs"
-                onMouseLeave={() => setIsCurrencyOpen(false)}
-              >
-                <div className="px-3 py-1.5 border-b border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Select Country Currency (10+)
-                </div>
-                <div className="max-h-64 overflow-y-auto py-1">
-                  {SUPPORTED_CURRENCIES.map((c) => (
-                    <button
-                      key={c.code}
-                      onClick={() => {
-                        setCurrencyByCode(c.code);
-                        setIsCurrencyOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 hover:bg-slate-800 transition flex items-center justify-between ${
-                        currentCurrency.code === c.code ? 'bg-cyan-950/60 text-cyan-300 font-bold' : 'text-slate-300'
-                      }`}
-                    >
-                      <span className="flex items-center space-x-2">
-                        <span>{c.flag}</span>
-                        <span>{c.name}</span>
-                      </span>
-                      <span className="font-mono text-slate-400">{c.symbol}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -264,8 +244,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                                   </div>
                                 </div>
                                 <div className="text-right shrink-0">
-                                  <span className="text-xs font-black text-cyan-700">
-                                    {formatPrice(srv.basePrice)}
+                                  <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 uppercase">
+                                    Free Quote
                                   </span>
                                 </div>
                               </button>

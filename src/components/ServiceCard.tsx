@@ -67,29 +67,19 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, navigate, onI
         </div>
       </div>
 
-      {/* Card Footer: Pricing or Growth Label & Button */}
+      {/* Card Footer: Timeline & Action Button (No Prices) */}
       <div className="pt-4 border-t border-slate-800/80 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1 text-[11px] text-slate-400 font-medium">
             <Clock className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Delivery: {service.deliveryTime || '3-5 Days'}</span>
+            <span>Turnaround: {service.deliveryTime || '3-5 Days'}</span>
           </div>
 
           <div className="text-right">
-            {isSMMCategory ? (
-              <span className="text-[10px] font-black uppercase tracking-wider text-cyan-300 bg-cyan-950/80 border border-cyan-800/80 px-2.5 py-1 rounded-md inline-block">
-                DIGITAL GROWTH & DEVELOPMENT SERVICES
-              </span>
-            ) : (
-              <>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">
-                  Package Price
-                </span>
-                <span className="text-lg font-black text-white">
-                  {formatPrice(service.basePrice)}
-                </span>
-              </>
-            )}
+            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-950/80 border border-emerald-800/80 px-2.5 py-1 rounded-md inline-flex items-center space-x-1">
+              <ShieldCheck className="w-3 h-3 mr-1" />
+              <span>Free Consultation</span>
+            </span>
           </div>
         </div>
 
@@ -98,27 +88,12 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, navigate, onI
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            if (isSMMCategory) {
-              navigate('service-detail', service.slug);
-            } else if (onInstantBuy) {
-              onInstantBuy(service.title, service.basePrice);
-            } else {
-              navigate('service-detail', service.slug);
-            }
+            navigate('service-detail', service.slug);
           }}
           className="w-full py-3 btn-cyan-primary rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-2 cursor-pointer"
         >
-          {isSMMCategory ? (
-            <>
-              <span>Explore Portfolio & Case Studies</span>
-              <span className="text-sm font-bold">»</span>
-            </>
-          ) : (
-            <>
-              <span>Get Now for {formatPrice(service.basePrice)}</span>
-              <span className="text-sm font-bold">»</span>
-            </>
-          )}
+          <span>Request Free Quote & Details</span>
+          <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
     </motion.div>

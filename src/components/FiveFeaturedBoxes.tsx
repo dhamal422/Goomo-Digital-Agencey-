@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import React, { useState, useRef } from 'react';
+import { motion, useScroll, useTransform, useSpring } from 'motion/react';
 import { 
   CheckCircle2, 
   ArrowRight, 
@@ -27,6 +27,60 @@ import {
 import { Service } from '../types';
 import { useCurrency } from '../context/CurrencyContext';
 import serviceGirlImg from '../assets/images/ai_service_girl_presentation_1785934753905.jpg';
+
+interface ScrollDrivenRightVisualProps {
+  children: React.ReactNode;
+  className?: string;
+  initialX?: number;
+  rotateAngle?: number;
+}
+
+/**
+ * ScrollDrivenRightVisual:
+ * Directly linked to scroll position ("scroll karne ke anusar").
+ * When scrolling down into view, the element/image smoothly glides in from the right to 0.
+ * When scrolling up, it glides back.
+ */
+const ScrollDrivenRightVisual: React.FC<ScrollDrivenRightVisualProps> = ({
+  children,
+  className = "",
+  initialX = 140,
+  rotateAngle = 8
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "center center"]
+  });
+
+  const rawX = useTransform(scrollYProgress, [0, 1], [initialX, 0]);
+  const rawOpacity = useTransform(scrollYProgress, [0, 0.7], [0.25, 1]);
+  const rawRotateY = useTransform(scrollYProgress, [0, 1], [rotateAngle, 0]);
+  const rawScale = useTransform(scrollYProgress, [0, 1], [0.93, 1]);
+
+  const x = useSpring(rawX, { stiffness: 220, damping: 26 });
+  const opacity = useSpring(rawOpacity, { stiffness: 220, damping: 26 });
+  const rotateY = useSpring(rawRotateY, { stiffness: 220, damping: 26 });
+  const scale = useSpring(rawScale, { stiffness: 220, damping: 26 });
+
+  return (
+    <motion.div
+      ref={containerRef}
+      style={{
+        x,
+        opacity,
+        rotateY,
+        scale,
+        transformStyle: 'preserve-3d',
+        perspective: 1000,
+        willChange: 'transform, opacity'
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 interface FiveFeaturedBoxesProps {
   navigate: (route: string, slug?: string) => void;
@@ -86,11 +140,13 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
           
           {/* BOX 1: 24/7 AI WhatsApp & Web Sales Agents */}
           <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -80, rotateY: -10, scale: 0.96 }}
+            whileInView={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
             viewport={{ once: true, amount: 0.15 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-gradient-to-r from-[#11998e] to-[#38ef7d] border border-emerald-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group relative overflow-hidden text-slate-100"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={{ scale: 1.015, rotateX: 2, rotateY: -2 }}
+            style={{ transformStyle: 'preserve-3d', perspective: 1200 }}
+            className="bg-gradient-to-r from-[#11998e] to-[#38ef7d] border border-emerald-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300 transform group relative overflow-hidden text-slate-100"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
@@ -205,43 +261,45 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
 
               {/* Right Column - Custom Visual Mockup Frame */}
               <div className="lg:col-span-5">
-                <div className="bg-[#1a2332] rounded-2xl p-5 border border-slate-700 shadow-2xl relative overflow-hidden">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-800 text-xs text-slate-400 font-mono">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-rose-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                    </div>
-                    <span className="text-[10px] text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">● LIVE AGENT ACTIVE</span>
-                  </div>
-
-                  <div className="mt-4 space-y-3 font-sans text-xs">
-                    <div className="bg-[#0f172a] p-3 rounded-xl border border-slate-800 text-slate-300">
-                      <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1">
-                        <span className="font-bold text-slate-400">Incoming Customer</span>
-                        <span>10:42 AM</span>
+                <ScrollDrivenRightVisual initialX={140} rotateAngle={8}>
+                  <div className="bg-[#1a2332] rounded-2xl p-5 border border-slate-700 shadow-2xl relative overflow-hidden">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-800 text-xs text-slate-400 font-mono">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-3 h-3 rounded-full bg-rose-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
                       </div>
-                      <p className="text-slate-200 font-medium">"Hi, what is the price for custom website design & AI WhatsApp setup?"</p>
+                      <span className="text-[10px] text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">● LIVE AGENT ACTIVE</span>
                     </div>
 
-                    <div className="bg-cyan-950/40 p-3 rounded-xl border border-cyan-800/60 text-cyan-100 ml-4">
-                      <div className="flex items-center justify-between text-[10px] text-cyan-300 mb-1">
-                        <span className="font-bold text-[#b2ebf2] flex items-center gap-1">
-                          <Bot className="w-3 h-3 text-[#b2ebf2]" /> Goomo AI WhatsApp Bot
+                    <div className="mt-4 space-y-3 font-sans text-xs">
+                      <div className="bg-[#0f172a] p-3 rounded-xl border border-slate-800 text-slate-300">
+                        <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1">
+                          <span className="font-bold text-slate-400">Incoming Customer</span>
+                          <span>10:42 AM</span>
+                        </div>
+                        <p className="text-slate-200 font-medium">"Hi, what is the price for custom website design & AI WhatsApp setup?"</p>
+                      </div>
+
+                      <div className="bg-cyan-950/40 p-3 rounded-xl border border-cyan-800/60 text-cyan-100 ml-4">
+                        <div className="flex items-center justify-between text-[10px] text-cyan-300 mb-1">
+                          <span className="font-bold text-[#b2ebf2] flex items-center gap-1">
+                            <Bot className="w-3 h-3 text-[#b2ebf2]" /> Goomo AI WhatsApp Bot
+                          </span>
+                          <span className="text-emerald-400 font-bold">0.3s reply</span>
+                        </div>
+                        <p className="text-slate-200">"Hello! Our Custom Website Design starts at {formatPrice(prices[1])} and WhatsApp AI Agent setup is {formatPrice(prices[0])}. Would you like an instant checkout?"</p>
+                      </div>
+
+                      <div className="bg-emerald-950/50 p-2.5 rounded-lg border border-emerald-800/60 text-emerald-300 text-[11px] flex items-center justify-between">
+                        <span className="flex items-center gap-1.5 font-bold">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Lead Qualified & Payment Gateway Attached
                         </span>
-                        <span className="text-emerald-400 font-bold">0.3s reply</span>
+                        <span className="text-[10px] bg-emerald-400 text-slate-950 px-2 py-0.5 rounded font-extrabold">CONFIRMED</span>
                       </div>
-                      <p className="text-slate-200">"Hello! Our Custom Website Design starts at {formatPrice(prices[1])} and WhatsApp AI Agent setup is {formatPrice(prices[0])}. Would you like an instant checkout?"</p>
-                    </div>
-
-                    <div className="bg-emerald-950/50 p-2.5 rounded-lg border border-emerald-800/60 text-emerald-300 text-[11px] flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 font-bold">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Lead Qualified & Payment Gateway Attached
-                      </span>
-                      <span className="text-[10px] bg-emerald-400 text-slate-950 px-2 py-0.5 rounded font-extrabold">CONFIRMED</span>
                     </div>
                   </div>
-                </div>
+                </ScrollDrivenRightVisual>
               </div>
 
             </div>
@@ -249,11 +307,13 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
 
           {/* BOX 2: Custom Website & Web Application Architecture */}
           <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: 80, rotateY: 10, scale: 0.96 }}
+            whileInView={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
             viewport={{ once: true, amount: 0.15 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-[#131b26] border border-slate-700/70 hover:border-cyan-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group relative overflow-hidden text-slate-100"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={{ scale: 1.015, rotateX: 2, rotateY: 2 }}
+            style={{ transformStyle: 'preserve-3d', perspective: 1200 }}
+            className="bg-[#131b26] border border-slate-700/70 hover:border-cyan-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300 transform group relative overflow-hidden text-slate-100"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
@@ -367,45 +427,47 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
 
               {/* Right Column - Custom Web Mockup Frame */}
               <div className="lg:col-span-5">
-                <div className="bg-[#1a2332] rounded-2xl border border-slate-700 shadow-2xl p-4">
-                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
-                    <div className="flex items-center space-x-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                      <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                <ScrollDrivenRightVisual initialX={150} rotateAngle={8}>
+                  <div className="bg-[#1a2332] rounded-2xl border border-slate-700 shadow-2xl p-4">
+                    <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+                      <div className="flex items-center space-x-1.5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                      </div>
+                      <div className="bg-[#0f172a] px-3 py-1 rounded text-[10px] text-cyan-300 font-mono">https://yourbrand.com</div>
                     </div>
-                    <div className="bg-[#0f172a] px-3 py-1 rounded text-[10px] text-cyan-300 font-mono">https://yourbrand.com</div>
+
+                    <div className="bg-[#0f172a] p-4 rounded-xl border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                          <Code2 className="w-4 h-4 text-[#b2ebf2]" /> Web Performance Index
+                        </span>
+                        <span className="bg-emerald-500/20 text-emerald-400 font-bold text-[10px] px-2 py-0.5 rounded border border-emerald-500/30">
+                          SCORE: 99 / 100
+                        </span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-[11px] text-slate-300">
+                          <span>First Contentful Paint (FCP)</span>
+                          <span className="text-emerald-400 font-bold">0.4s</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-1.5">
+                          <div className="bg-emerald-400 h-1.5 rounded-full w-[98%]"></div>
+                        </div>
+
+                        <div className="flex justify-between text-[11px] text-slate-300 pt-1">
+                          <span>Speed Index Metric</span>
+                          <span className="text-emerald-400 font-bold">0.6s</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-1.5">
+                          <div className="bg-cyan-400 h-1.5 rounded-full w-[96%]"></div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-
-                  <div className="bg-[#0f172a] p-4 rounded-xl border border-slate-800 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                        <Code2 className="w-4 h-4 text-[#b2ebf2]" /> Web Performance Index
-                      </span>
-                      <span className="bg-emerald-500/20 text-emerald-400 font-bold text-[10px] px-2 py-0.5 rounded border border-emerald-500/30">
-                        SCORE: 99 / 100
-                      </span>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-[11px] text-slate-300">
-                        <span>First Contentful Paint (FCP)</span>
-                        <span className="text-emerald-400 font-bold">0.4s</span>
-                      </div>
-                      <div className="w-full bg-slate-800 rounded-full h-1.5">
-                        <div className="bg-emerald-400 h-1.5 rounded-full w-[98%]"></div>
-                      </div>
-
-                      <div className="flex justify-between text-[11px] text-slate-300 pt-1">
-                        <span>Speed Index Metric</span>
-                        <span className="text-emerald-400 font-bold">0.6s</span>
-                      </div>
-                      <div className="w-full bg-slate-800 rounded-full h-1.5">
-                        <div className="bg-cyan-400 h-1.5 rounded-full w-[96%]"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                </ScrollDrivenRightVisual>
               </div>
 
             </div>
@@ -413,11 +475,13 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
 
           {/* BOX 3: Social Media & Viral Growth Engine */}
           <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -80, rotateY: -10, scale: 0.96 }}
+            whileInView={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
             viewport={{ once: true, amount: 0.15 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-[#131b26] border border-slate-700/70 hover:border-cyan-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group relative overflow-hidden text-slate-100"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={{ scale: 1.015, rotateX: 2, rotateY: -2 }}
+            style={{ transformStyle: 'preserve-3d', perspective: 1200 }}
+            className="bg-[#131b26] border border-slate-700/70 hover:border-cyan-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300 transform group relative overflow-hidden text-slate-100"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
@@ -531,32 +595,34 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
 
               {/* Right Column - Custom Analytics Graph Frame */}
               <div className="lg:col-span-5">
-                <div className="bg-[#1a2332] rounded-2xl border border-slate-700 shadow-2xl p-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                    <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                      <TrendingUp className="w-4 h-4 text-[#b2ebf2]" /> Organic Reach Growth
-                    </span>
-                    <span className="bg-cyan-500/20 text-[#b2ebf2] text-[10px] font-bold px-2 py-0.5 rounded border border-cyan-500/30">
-                      +342% THIS MONTH
-                    </span>
-                  </div>
-
-                  <div className="mt-4 bg-[#0f172a] p-4 rounded-xl border border-slate-800 space-y-3">
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-2xl font-black text-white">1,240,800</span>
-                      <span className="text-xs text-slate-400">Total Views</span>
+                <ScrollDrivenRightVisual initialX={160} rotateAngle={10}>
+                  <div className="bg-[#1a2332] rounded-2xl border border-slate-700 shadow-2xl p-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                      <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <TrendingUp className="w-4 h-4 text-[#b2ebf2]" /> Organic Reach Growth
+                      </span>
+                      <span className="bg-cyan-500/20 text-[#b2ebf2] text-[10px] font-bold px-2 py-0.5 rounded border border-cyan-500/30">
+                        +342% THIS MONTH
+                      </span>
                     </div>
 
-                    <div className="h-16 flex items-end justify-between gap-1 pt-2">
-                      <div className="bg-slate-800 w-full h-[25%] rounded-t"></div>
-                      <div className="bg-slate-700 w-full h-[40%] rounded-t"></div>
-                      <div className="bg-cyan-900 w-full h-[55%] rounded-t"></div>
-                      <div className="bg-cyan-700 w-full h-[70%] rounded-t"></div>
-                      <div className="bg-cyan-500 w-full h-[88%] rounded-t"></div>
-                      <div className="bg-[#b2ebf2] w-full h-[100%] rounded-t shadow-lg"></div>
+                    <div className="mt-4 bg-[#0f172a] p-4 rounded-xl border border-slate-800 space-y-3">
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-2xl font-black text-white">1,240,800</span>
+                        <span className="text-xs text-slate-400">Total Views</span>
+                      </div>
+
+                      <div className="h-16 flex items-end justify-between gap-1 pt-2">
+                        <div className="bg-slate-800 w-full h-[25%] rounded-t"></div>
+                        <div className="bg-slate-700 w-full h-[40%] rounded-t"></div>
+                        <div className="bg-cyan-900 w-full h-[55%] rounded-t"></div>
+                        <div className="bg-cyan-700 w-full h-[70%] rounded-t"></div>
+                        <div className="bg-cyan-500 w-full h-[88%] rounded-t"></div>
+                        <div className="bg-[#b2ebf2] w-full h-[100%] rounded-t shadow-lg"></div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </ScrollDrivenRightVisual>
               </div>
 
             </div>
@@ -566,10 +632,11 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
           {/* UNIQUE MIDDLE SHOWCASE BANNER: FEMALE AI SERVICE PRESENTER & EXPERT HUB */}
           {/* ========================================================================= */}
           <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.92, rotateX: 8 }}
+            whileInView={{ opacity: 1, scale: 1, rotateX: 0 }}
             viewport={{ once: true, amount: 0.15 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            style={{ transformStyle: 'preserve-3d', perspective: 1200 }}
             className="my-14 bg-[#131b26] rounded-3xl p-6 sm:p-10 border border-slate-700/80 shadow-2xl relative overflow-hidden group"
           >
             
@@ -580,44 +647,46 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
               
               {/* Left Column: Girl Presenter Portrait with Floating Badges */}
               <div className="lg:col-span-6 relative">
-                <div className="relative rounded-2xl overflow-hidden border border-slate-700 shadow-2xl bg-[#0c131f]">
-                  <img 
-                    src={serviceGirlImg} 
-                    alt="AI Service Specialist & Engineering Team Lead"
-                    className="w-full h-auto object-cover max-h-[420px] mx-auto hover:scale-105 transition-transform duration-700"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c131f]/90 via-transparent to-transparent"></div>
-                  
-                  <div className="absolute bottom-4 left-4 right-4 bg-[#131b26]/90 backdrop-blur border border-slate-700/80 p-3 rounded-xl flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-extrabold text-white flex items-center gap-1.5">
-                        <Award className="w-4 h-4 text-amber-400" />
-                        <span>Executive AI Service Specialist</span>
+                <ScrollDrivenRightVisual initialX={160} rotateAngle={10}>
+                  <div className="relative rounded-2xl overflow-hidden border border-slate-700 shadow-2xl bg-[#0c131f]">
+                    <img 
+                      src={serviceGirlImg} 
+                      alt="AI Service Specialist & Engineering Team Lead"
+                      className="w-full h-auto object-cover max-h-[420px] mx-auto hover:scale-105 transition-transform duration-700"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0c131f]/90 via-transparent to-transparent"></div>
+                    
+                    <div className="absolute bottom-4 left-4 right-4 bg-[#131b26]/90 backdrop-blur border border-slate-700/80 p-3 rounded-xl flex items-center justify-between">
+                      <div>
+                        <div className="text-xs font-extrabold text-white flex items-center gap-1.5">
+                          <Award className="w-4 h-4 text-amber-400" />
+                          <span>Executive AI Service Specialist</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-medium mt-0.5">
+                          Guaranteed 10x Operational Speed & ROI
+                        </div>
                       </div>
-                      <div className="text-[10px] text-slate-400 font-medium mt-0.5">
-                        Guaranteed 10x Operational Speed & ROI
-                      </div>
+                      <span className="bg-emerald-400 text-slate-950 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        ● Active SLA
+                      </span>
                     </div>
-                    <span className="bg-emerald-400 text-slate-950 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">
-                      ● Active SLA
-                    </span>
                   </div>
-                </div>
 
-                {/* Floating 3D Badge overlays around image */}
-                <div className="absolute -top-3 -left-3 animate-float-left bg-[#131b26] text-white border border-slate-700 px-3 py-1.5 rounded-xl shadow-xl flex items-center space-x-1.5 text-xs font-bold">
-                  <span className="text-emerald-400">⚡</span>
-                  <span>ChatGPT 4o & Gemini</span>
-                </div>
-                <div className="absolute top-1/3 -right-3 animate-float-right bg-[#131b26] text-white border border-slate-700 px-3 py-1.5 rounded-xl shadow-xl flex items-center space-x-1.5 text-xs font-bold">
-                  <span className="text-cyan-400">💬</span>
-                  <span>Meta WhatsApp Bot</span>
-                </div>
-                <div className="absolute -bottom-3 right-6 animate-float-slow bg-[#131b26] text-white border border-slate-700 px-3 py-1.5 rounded-xl shadow-xl flex items-center space-x-1.5 text-xs font-bold">
-                  <span className="text-amber-400">✨</span>
-                  <span>Midjourney V6 4K</span>
-                </div>
+                  {/* Floating 3D Badge overlays around image */}
+                  <div className="absolute -top-3 -left-3 animate-float-left bg-[#131b26] text-white border border-slate-700 px-3 py-1.5 rounded-xl shadow-xl flex items-center space-x-1.5 text-xs font-bold">
+                    <span className="text-emerald-400">⚡</span>
+                    <span>ChatGPT 4o & Gemini</span>
+                  </div>
+                  <div className="absolute top-1/3 -right-3 animate-float-right bg-[#131b26] text-white border border-slate-700 px-3 py-1.5 rounded-xl shadow-xl flex items-center space-x-1.5 text-xs font-bold">
+                    <span className="text-cyan-400">💬</span>
+                    <span>Meta WhatsApp Bot</span>
+                  </div>
+                  <div className="absolute -bottom-3 right-6 animate-float-slow bg-[#131b26] text-white border border-slate-700 px-3 py-1.5 rounded-xl shadow-xl flex items-center space-x-1.5 text-xs font-bold">
+                    <span className="text-amber-400">✨</span>
+                    <span>Midjourney V6 4K</span>
+                  </div>
+                </ScrollDrivenRightVisual>
               </div>
 
               {/* Right Column: Service Hub Presentation & Core Advantages */}
@@ -689,11 +758,13 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
 
           {/* BOX 4: AI Content & Photorealistic Image Studio */}
           <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: 80, rotateY: 10, scale: 0.96 }}
+            whileInView={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
             viewport={{ once: true, amount: 0.15 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-[#131b26] border border-slate-700/70 hover:border-cyan-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group relative overflow-hidden text-slate-100"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={{ scale: 1.015, rotateX: 2, rotateY: 2 }}
+            style={{ transformStyle: 'preserve-3d', perspective: 1200 }}
+            className="bg-[#131b26] border border-slate-700/70 hover:border-cyan-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300 transform group relative overflow-hidden text-slate-100"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
@@ -807,7 +878,8 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
 
               {/* Right Column - Custom Media Frame */}
               <div className="lg:col-span-5">
-                <div className="bg-[#1a2332] rounded-2xl border border-slate-700 shadow-2xl p-4">
+                <ScrollDrivenRightVisual initialX={150} rotateAngle={8}>
+                  <div className="bg-[#1a2332] rounded-2xl border border-slate-700 shadow-2xl p-4">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                     <span className="text-xs font-bold text-white flex items-center gap-1.5">
                       <ImageIcon className="w-4 h-4 text-[#b2ebf2]" /> AI Image Generator Engine
@@ -830,18 +902,21 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
                     </div>
                   </div>
                 </div>
-              </div>
+              </ScrollDrivenRightVisual>
+            </div>
 
             </div>
           </motion.div>
 
           {/* BOX 5: Automated CRM & Lead Pipelines */}
           <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -80, rotateY: -10, scale: 0.96 }}
+            whileInView={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
             viewport={{ once: true, amount: 0.15 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-[#131b26] border border-slate-700/70 hover:border-cyan-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group relative overflow-hidden text-slate-100"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={{ scale: 1.015, rotateX: 2, rotateY: -2 }}
+            style={{ transformStyle: 'preserve-3d', perspective: 1200 }}
+            className="bg-[#131b26] border border-slate-700/70 hover:border-cyan-400/50 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-300 transform group relative overflow-hidden text-slate-100"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
@@ -955,46 +1030,48 @@ export const FiveFeaturedBoxes: React.FC<FiveFeaturedBoxesProps> = ({ navigate, 
 
               {/* Right Column - Custom Workflow Nodes Frame */}
               <div className="lg:col-span-5">
-                <div className="bg-[#1a2332] rounded-2xl border border-slate-700 shadow-2xl p-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                    <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                      <Workflow className="w-4 h-4 text-[#b2ebf2]" /> Automated Workflow Canvas
-                    </span>
-                    <span className="bg-cyan-500/20 text-[#b2ebf2] text-[10px] font-bold px-2 py-0.5 rounded border border-cyan-500/30">
-                      TRIGGERED
-                    </span>
+                <ScrollDrivenRightVisual initialX={150} rotateAngle={8}>
+                  <div className="bg-[#1a2332] rounded-2xl border border-slate-700 shadow-2xl p-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                      <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <Workflow className="w-4 h-4 text-[#b2ebf2]" /> Automated Workflow Canvas
+                      </span>
+                      <span className="bg-cyan-500/20 text-[#b2ebf2] text-[10px] font-bold px-2 py-0.5 rounded border border-cyan-500/30">
+                        TRIGGERED
+                      </span>
+                    </div>
+
+                    <div className="mt-3 space-y-2 text-xs">
+                      <div className="bg-[#0f172a] p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
+                          <span className="font-bold text-slate-200">1. Form Submission Received</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400">Trigger</span>
+                      </div>
+
+                      <div className="w-0.5 h-3 bg-cyan-500/40 mx-auto"></div>
+
+                      <div className="bg-[#0f172a] p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                          <span className="font-bold text-slate-200">2. AI Lead Qualification Score</span>
+                        </div>
+                        <span className="text-[10px] text-emerald-400 font-bold">94/100</span>
+                      </div>
+
+                      <div className="w-0.5 h-3 bg-emerald-500/40 mx-auto"></div>
+
+                      <div className="bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-800 flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          <span className="font-bold text-emerald-200">3. WhatsApp Alert & CRM Entry</span>
+                        </div>
+                        <span className="text-[10px] bg-emerald-400 text-slate-950 px-1.5 py-0.5 rounded font-black">DONE</span>
+                      </div>
+                    </div>
                   </div>
-
-                  <div className="mt-3 space-y-2 text-xs">
-                    <div className="bg-[#0f172a] p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
-                        <span className="font-bold text-slate-200">1. Form Submission Received</span>
-                      </div>
-                      <span className="text-[10px] text-slate-400">Trigger</span>
-                    </div>
-
-                    <div className="w-0.5 h-3 bg-cyan-500/40 mx-auto"></div>
-
-                    <div className="bg-[#0f172a] p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 rounded-full bg-purple-400"></div>
-                        <span className="font-bold text-slate-200">2. AI Lead Qualification Score</span>
-                      </div>
-                      <span className="text-[10px] text-emerald-400 font-bold">94/100</span>
-                    </div>
-
-                    <div className="w-0.5 h-3 bg-emerald-500/40 mx-auto"></div>
-
-                    <div className="bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-800 flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="font-bold text-emerald-200">3. WhatsApp Alert & CRM Entry</span>
-                      </div>
-                      <span className="text-[10px] bg-emerald-400 text-slate-950 px-1.5 py-0.5 rounded font-black">DONE</span>
-                    </div>
-                  </div>
-                </div>
+                </ScrollDrivenRightVisual>
               </div>
 
             </div>

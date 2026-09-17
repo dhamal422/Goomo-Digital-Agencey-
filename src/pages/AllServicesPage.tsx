@@ -799,15 +799,9 @@ export const AllServicesPage: React.FC<AllServicesPageProps> = ({
                       <Clock className="w-3.5 h-3.5 mr-1 text-slate-950" />
                       {service.deliveryTime || '2-4 Days'}
                     </span>
-                    {(service.category === 'Social Media Management Services' || service.category.includes('Social Media Management') || service.category === 'SMM Management') ? (
-                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-950 bg-slate-950/15 border border-slate-950/20 px-2 py-0.5 rounded">
-                        DIGITAL GROWTH & DEVELOPMENT SERVICES
-                      </span>
-                    ) : (
-                      <span className="text-base font-black text-slate-950">
-                        {formatPrice(service.basePrice)}
-                      </span>
-                    )}
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-950 bg-white/70 border border-slate-950/20 px-2.5 py-0.5 rounded shadow-xs">
+                      Free Quote / Scope
+                    </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
